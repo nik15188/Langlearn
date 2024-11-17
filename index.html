@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Speaking Practice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .chat-container {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            min-height: 300px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>English Speaking Practice</h1>
+    <div class="chat-container" id="chatContainer">
+        <p>Click 'Start Speaking' and practice your English!</p>
+    </div>
+    <button id="startBtn">Start Speaking</button>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const chatContainer = document.getElementById('chatContainer');
+        
+        // Initialize speech recognition
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        // Initialize speech synthesis
+        const synth = window.speechSynthesis;
+
+        // Sample responses for basic conversation
+        const responses = {
+            'hello': 'Hello! How are you today?',
+            'how are you': 'I\'m doing well, thank you! How about you?',
+            'what is your name': 'My name is AI Teacher. Nice to meet you!',
+            'goodbye': 'Goodbye! Have a great day!',
+        };
+
+        startBtn.addEventListener('click', () => {
+            recognition.start();
+            startBtn.textContent = 'Listening...';
+        });
+
+        recognition.onresult = (event) => {
+            const userText = event.results[0][0].transcript.toLowerCase();
+            addMessage('You: ' + userText);
+
+            // Find response or use default
+            let response = 'I heard you! Try asking me something else.';
+            for (let key in responses) {
+                if (userText.includes(key)) {
+                    response = responses[key];
+                    break;
+                }
+            }
+
+            addMessage('AI: ' + response);
+            speak(response);
+        };
+
+        recognition.onend = () => {
+            startBtn.textContent = 'Start Speaking';
+        };
+
+        function addMessage(message) {
+            const p = document.createElement('p');
+            p.textContent = message;
+            chatContainer.appendChild(p);
+        }
+
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            synth.speak(utterance);
+        }
+    </script>
+</body>
+</html>
